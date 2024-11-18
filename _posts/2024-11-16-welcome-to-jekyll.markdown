@@ -4,7 +4,7 @@ title:  "Timewarp Blogpost"
 date:   2024-11-18 15:21:05 +0100
 permalink: /timewarp
 ---
-##Introduction
+## Introduction
 - Quick Overview of Molecular Dynamics
 	- Importance of MD
 	- Challenges of standard MD simulation
@@ -19,7 +19,7 @@ permalink: /timewarp
 		- Intuition for methodology used to tackle the problem
 			- Especially regarding the goal of transferability
 
-##Foundations
+## Foundations
 
 - MCMC + Metropolis Hastings + Gibbs sampling
 	- Explaination based on the Probabilistic ML lecture (explain pseudocode)
@@ -32,9 +32,9 @@ permalink: /timewarp
 	- RealNVP
 		-Explaination based on https://lilianweng.github.io/posts/2018-10-13-flow-models/
 
-##Putting everything together
+## Putting everything together
 
-![Full architecture](architecture.png)
+![Full architecture](assets/architecture.png)
 
 - MCMC + MH
 	- Used proposal distribution
@@ -56,4 +56,4 @@ permalink: /timewarp
 	- Likelihood training
 	- Acceptance training
 
-##Conclusion
+## Conclusion
