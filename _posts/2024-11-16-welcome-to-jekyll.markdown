@@ -1,29 +1,59 @@
 ---
 layout: post
 title:  "Timewarp Blogpost"
-date:   2024-11-16 15:21:05 +0100
+date:   2024-11-18 15:21:05 +0100
 permalink: /timewarp
 ---
-You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
+##Introduction
+- Quick Overview of Molecular Dynamics
+	- Importance of MD
+	- Challenges of standard MD simulation
+		- Impossibly slow simulation for larger timespans (necessary to observe e.g. folding)
+		- No transferability between different molecular systems
+	- Underlying physics
+		- Significance of the Boltzmann distribution for MD
+		- Langevin dynamics
+	- Example
+		- Possible desired input/output pair to motivate the problem
+			- Introduce notation
+		- Intuition for methodology used to tackle the problem
+			- Especially regarding the goal of transferability
 
-Jekyll requires blog post files to be named according to the following format:
+##Foundations
 
-`YEAR-MONTH-DAY-title.MARKUP`
+- MCMC + Metropolis Hastings + Gibbs sampling
+	- Explaination based on the Probabilistic ML lecture (explain pseudocode)
+- Transformers
+	- Explaination based on the Foundation Models lecture
+	- Specially go into multihead kernel self-attention (needed later)
+- (Conditional) Normalizing Flows
+	- Explaination based on https://arxiv.org/pdf/1505.05770
+	- Connection to MCMC
+	- RealNVP
+		-Explaination based on https://lilianweng.github.io/posts/2018-10-13-flow-models/
 
-Where `YEAR` is a four-digit number, `MONTH` and `DAY` are both two-digit numbers, and `MARKUP` is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+##Putting everything together
 
-Jekyll also offers powerful support for code snippets:
+![Full architecture](architecture.png)
 
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
-{% endhighlight %}
+- MCMC + MH
+	- Used proposal distribution
+	- Explaination of the full adapted algorithm
+		- Batch sampling
+- Normalizing Flow
+	- Used base distribution
+	- Used diffeomorphisms
+		- Discarding of the MD velocity
+	- Used Dataset
+	- Used transformations for coupling layers om RealNVP
+	- Satisfaction of physical symmetries
+- Transformer
+	- Used input vectors and structure
+	- Adaptations made
+		- Kernel self-attention
+		- Others
+- Training (Loss functions)
+	- Likelihood training
+	- Acceptance training
 
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
-
-[jekyll-docs]: https://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
+##Conclusion
