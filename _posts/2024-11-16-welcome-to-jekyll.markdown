@@ -3,8 +3,15 @@ layout: post
 title:  "Timewarp Blogpost"
 date:   2024-11-18 15:21:05 +0100
 permalink: /timewarp
+use_math: true
 ---
 ## Introduction
+
+$$
+K(a,b) = \int \mathcal{D}x(t) \exp(2\pi i S[x]/\hbar)
+$$
+
+
 - Quick Overview of Molecular Dynamics
 	- Importance of MD
 	- Challenges of standard MD simulation
