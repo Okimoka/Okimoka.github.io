@@ -78,7 +78,7 @@ Where $P(x)$ is our desired distribution (in this case the Boltzmann distributio
 
 ### The proposal distribution $g(x)$
 
-This is a bit more tricky. In an ideal world we would like to know $\mu(x(t+\tau)|x(t))$, which is the probability of ne next state $x(t+\tau)$ given our current state $x(t)$. This would obviously propose the best possible (i.e. most probable) new states.
+This is a bit more tricky. In an ideal world we would like to know $\mu(x(t+\tau)\mid x(t))$, which is the probability of ne next state $x(t+\tau)$ given our current state $x(t)$. This would obviously propose the best possible (i.e. most probable) new states.
 
  We could theoretically perform many simulations starting at $x(t)$ and compute our probability in this way, but of course we have better options. The entire rest of the paper will be about finding a good approximation for this specific distribution.
 
@@ -86,7 +86,7 @@ This is a bit more tricky. In an ideal world we would like to know $\mu(x(t+\tau
 
 ## Conditional normalizing flows
 
-Just as with the Monte Carlo algorithm, most of the groundwork has already been laid out for us, and we mostly have to perform adjustments to the existing basis. Conditional normalizing flows (which are a special case of regular normalizing flows) are designed for the sole purpose of modeling some conditional distribution $p(x|y)$, so they are a perfect fit for our scenario!
+Just as with the Monte Carlo algorithm, most of the groundwork has already been laid out for us, and we mostly have to perform adjustments to the existing basis. Conditional normalizing flows (which are a special case of regular normalizing flows) are designed for the sole purpose of modeling some conditional distribution $p(x\mid y)$, so they are a perfect fit for our scenario!
 
 Again, I would like to introduce the algorithm with the help of an illustration. This is a regular normalizing flow, but it can be easily adapted
 (bold letters represent random variable vectors).
@@ -100,7 +100,7 @@ The general idea of normalizing flows is:
 
 [Image source](https://lilianweng.github.io/posts/2018-10-13-flow-models/)
 
-Obviously, with known $f_i$, this would easily allow us to randomly sample an easy distribution like the Gaussian, apply our transformations, and receive a sample that is sampled accordingly to our desired distribution $\mu(x(t+\tau)|x(t))$!
+Obviously, with known $f_i$, this would easily allow us to randomly sample an easy distribution like the Gaussian, apply our transformations, and receive a sample that is sampled accordingly to our desired distribution $\mu(x(t+\tau)\mid x(t))$!
 
 What's left for us is to actually find the functions $f_i$ that are responsible for the transformation, and make sure they fulfil all of the required properties (e.g. be easily computable). The shape and parametrization of these functions will be the topic of the next main step, which will conclude the whole setup for our MH algorithm.
 
@@ -121,7 +121,7 @@ I highly recommend [Lilian Weng's blogpost](https://lilianweng.github.io/posts/2
 ---
 
 So let's apply the normalizing flow model to our problem.
-Remember, we start with $x(t)$ and we want to end up in a sample from $\mu(x(t+\tau)|x(t))$
+Remember, we start with $x(t)$ and we want to end up in a sample from $\mu(x(t+\tau)\mid x(t))$
 
 - Our random variable vector is made up by the two latent random variables, $z^p$ and $z^v$, which at the beginning are both sampled from the standard Gaussian:
 
@@ -180,7 +180,7 @@ Note the diagonal lines signifying where the two rightmost subcomponents fit int
 
 ## Training
 
-We have finally set everything up, and now it's time to perform training on the parameters $\theta$ for our normalizing flow to approximate $\mu(x(t+\tau)|x(t))$.
+We have finally set everything up, and now it's time to perform training on the parameters $\theta$ for our normalizing flow to approximate $\mu(x(t+\tau)\mid x(t))$.
  
 For the dataset, sequences $\mathcal{T}_i = (x(0),x(\tau),x(2\tau),...)$ were generated for different peptides using a traditional MD Library.
 
@@ -190,7 +190,7 @@ For the Loss function, there are actually two objectives we are interested in op
 1. The deviation from the dataset, which is the standard log likelihood: $$\mathcal{L}_{\mathrm{lik}}(\theta):=\frac{1}{K}\sum_{k=1}^{K} \text{log} \ p_{\theta}(x^{(k)}(t+\tau)\vert x^{(k)}(t))$$
 
 2. The acceptance in MH. Recall that: "A good proposal distribution will lead to better states being generated, and thus more states being accepted". \
-To maximize our acceptance, we need to maximize the term (the big fraction has been shortened to $r_{\theta}$ for brevity) $$A(x^{\prime},x)=\mathrm{min}\left(1,r_{\theta}(x,x')\right)$$ Which is equivalent to maximizing $r_{\theta}$ directly. This results in the loss function: $$\mathcal{L}_{\mathrm{acc}}(\theta):=\frac{1}{K}\sum_{k=1}^{K}\log r_{\theta}(x^{(k)}(t),{x'}_{\theta}^{(k)}(t+\tau))$$ The issue here is that in order to please the acceptance distribution, only conservative changes in state will be proposed, which is not productive either (exploration vs. exploitation). To counteract this, we instead use a Loss function very similar to $\mathcal{L}_{\mathrm{lik}}(\theta)$: $$L_{\text{ent}}(\theta) = -\frac{1}{K} \sum_{k=1}^K \log p_{\theta}({x'}_{\theta}^{(k)}(t + \tau) | x^{(k)}(t))$$ This can be interpreted as the negative log-likelihood of the proposed transitions according to the model, allowing for more exploration in our transitions.
+To maximize our acceptance, we need to maximize the term (the big fraction has been shortened to $r_{\theta}$ for brevity) $$A(x^{\prime},x)=\mathrm{min}\left(1,r_{\theta}(x,x')\right)$$ Which is equivalent to maximizing $r_{\theta}$ directly. This results in the loss function: $$\mathcal{L}_{\mathrm{acc}}(\theta):=\frac{1}{K}\sum_{k=1}^{K}\log r_{\theta}(x^{(k)}(t),{x'}_{\theta}^{(k)}(t+\tau))$$ The issue here is that in order to please the acceptance distribution, only conservative changes in state will be proposed, which is not productive either (exploration vs. exploitation). To counteract this, we instead use a Loss function very similar to $\mathcal{L}_{\mathrm{lik}}(\theta)$: $$L_{\text{ent}}(\theta) = -\frac{1}{K} \sum_{k=1}^K \log p_{\theta}({x'}_{\theta}^{(k)}(t + \tau) \mid  x^{(k)}(t))$$ This can be interpreted as the negative log-likelihood of the proposed transitions according to the model, allowing for more exploration in our transitions.
 
 
 ## Putting everything together
