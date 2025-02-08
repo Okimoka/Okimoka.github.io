@@ -6,11 +6,7 @@ permalink: /timewarp
 use_math: true
 ---
 
-{::nomarkdown}
-$test$
-{:/}
-
-\( x^2 + y^2 = z^2 \).
+\$inline math\$
 
 
 Being able to make accurate, fast predictions about the properties of molecules - without requiring absurd amounts of computing power - has to be one of the most exciting (and apt!) uses of deep learning today.
