@@ -6,9 +6,6 @@ permalink: /timewarp
 use_math: true
 ---
 
-\$inline math\$
-
-
 Being able to make accurate, fast predictions about the properties of molecules - without requiring absurd amounts of computing power - has to be one of the most exciting (and apt!) uses of deep learning today.
 It allows us to understand the very foundation of our world, and enables better research in developing new drugs, new materials, or even exploring outer space.
 
