@@ -1,10 +1,15 @@
 <script type="text/x-mathjax-config">
-    window.MathJax = {
-        tex: {
-            inlineMath: [['$', '$']],      // Inline math using $...$
-            displayMath: [['$$', '$$']]    // Display math using $$...$$
-        }
-    };
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    options: {
+      enableMenu: true
+    }
+  };
 </script>
 <script type="text/javascript" async
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
