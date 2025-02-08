@@ -1,10 +1,11 @@
 ---
 layout: post
 title:  "Timewarp Blogpost"
-date:   2024-11-18 15:21:05 +0100
+date:   2025-02-08 23:38:05 +0100
 permalink: /timewarp
 use_math: true
 ---
+
 
 Being able to make accurate, fast predictions about the properties of molecules - without requiring absurd amounts of computing power - has to be one of the most exciting (and apt!) uses of deep learning today.
 It allows us to understand the very foundation of our world, and enables better research in developing new drugs, new materials, or even exploring outer space.
@@ -34,7 +35,7 @@ The formula closesly expresses this fact by assigning higher probabilities to st
 
 Consider that a folded molecule state corresponds to a local energy minimum, and you can see why this formula is of such central interest to us! Being able to efficiently sample from the Boltzmann distribution already turns out to be enough for learning about many important properties of molecules.
 
-In fact, from now on we will only focus on how to efficiently sample from this distrubution (which, given the complex energy landscape of a molecule, cannot usually be efficiently sampled from).
+In fact, from now on we will only focus on how to efficiently sample from this distribution (which, given the complex energy landscape of a molecule, cannot usually be efficiently sampled from).
 
 ## Sampling from a distribution
 
@@ -240,7 +241,7 @@ These are the results of running timewarp on an Alanine dipeptide molecule.
 
 I think Timewarp is a fantastic step in making molecular simulations more efficient and more transferable. It can be easily adapted to fit different purposes, like modifying the MH step to instead run an exploration algorithm as mentioned earlier, and I think this flexibility will be of central importance when integrated into bigger systems.
 
-It is apparent that throughout the entire way, the authors aimed to choose options that allow the final product to be transferable (like representing molecules in cartesian coordinates rather than all-atom resolution, or choosing normalizing flows which have proven in the past to be great for these purposes).
+It is apparent that throughout the entire way, the authors aimed to choose options that allow the final product to be transferable (like representing molecules in cartesian coordinates rather than all-atom resolution, or choosing normalizing flows which have proven in the past to be great for these purposes). And I think this is a perfect application of deep learning methods in this sense.
 
 Even though the acceptance rate in MH is quite low, Timewarp still achieves a very impressive speedup over traditional MD, while still keeping up regarding results.
 
@@ -248,7 +249,7 @@ Future research could aim into improving this acceptance rate, or even aim for t
 
 ---
 
-Thank you for reading my blog post, and I hope you enjoyed learning about this paper as much as I did
+Thank you for reading my blog post, and I hope you enjoyed learning about this paper as much as I did!
 
 # References
 
