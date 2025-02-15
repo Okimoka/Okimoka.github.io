@@ -44,7 +44,7 @@ Before we perform MH, we need two further distributions:
 
 - A proposal distribution $g(x)$. For now you can simply imagine a random walk (meaning given some state, output a random state in its vicinity)
 
-- An acceptance distribution $A(x \rightarrow x')$ (sometimes written $A(x \rightarrow x')$ to signify the change from $x$ to $x'$), which you can picture as an "educated guesser" who tells you whether some state is good or no good
+- An acceptance distribution $A(x, x')$ (sometimes written $A(x \rightarrow x')$ to signify the change from $x$ to $x'$), which you can picture as an "educated guesser" who tells you whether some state is good or no good
 
 Now we can run the algorithm! Starting at timestep $t_0$ and some starting state $\theta_0$...
 
@@ -70,7 +70,7 @@ Luckily for us, the choice of $A(x, x')$ is rather trivial. So far I've omitted 
 
 $\frac{A(x^{\prime},x)}{A(x,x^{\prime})}=\frac{P(x^{\prime})}{P(x)}\frac{g(x\mid x^{\prime})}{g(x^{\prime}\mid x)}$
 
-This is in order to fulfil the _detailed balance_ property (i.e. it should be equally likely to transition from $x$ to $x'$ as it is to transition from $x'$ to $x$), as well as the uniqueness property of the stationary distribution. One choice for $A(x',x)$ which fulfils the equation is:
+This is in order to fulfil the _detailed balance_ property (i.e. it should be equally likely to transition from $x$ to $x'$ as it is to transition from $x'$ to $x$), as well as the uniqueness property of the stationary distribution. One common choice (and also ours) for $A(x',x)$ which fulfils the equation is:
 
 $A(x^{\prime},x)=\mathrm{min}\left(1,{\frac{P(x^{\prime})}{P(x)}}{\frac{g(x\mid x^{\prime})}{g(x^{\prime}\mid x)}}\right)$
 
@@ -78,7 +78,7 @@ Where $P(x)$ is our desired distribution (in this case the Boltzmann distributio
 
 ### The proposal distribution $g(x)$
 
-This is a bit more tricky. In an ideal world we would like to know $\mu(x(t+\tau)\mid x(t))$, which is the probability of ne next state $x(t+\tau)$ given our current state $x(t)$. This would obviously propose the best possible (i.e. most probable) new states.
+This is a bit more tricky. In an ideal world we would like to know $\mu(x(t+\tau)\mid x(t))$, which is the probability of the next state $x(t+\tau)$ given our current state $x(t)$. This would obviously propose the best possible (i.e. most probable) new states.
 
  We could theoretically perform many simulations starting at $x(t)$ and compute our probability in this way, but of course we have better options. The entire rest of the paper will be about finding a good approximation for this specific distribution.
 
@@ -140,7 +140,7 @@ As mentioned earlier, the functions $f$ need to exhibit some specific properties
 
 The characteristics of RealNVP are:
 1. It uses uses scaling and shifting transformations for $f$. Intuitively these also make sense to be easily invertible.
-2. The transformations $f$ only transform part of the random variable vector in each step, allowing for an alternating pattern in the flow layers. In each step, the parameters of the scale and shift are given by the untransformed part of the random variable vector.
+2. The transformations $f$ only transform part of the random variable vector in each step, allowing in our case for an alternating pattern in the flow layers. In each step, the parameters of the scale and shift are given by the untransformed part of the random variable vector.
 
 Our specific setup for RealNVP is shown in this picture:
 ![RealNVP](assets/realnvp.png)
@@ -156,7 +156,7 @@ There is just one more question left. How do we know the scaling and transformat
 
 ### Atom transformers
 
-As it is so common with current ML papers, we cannot get around using transformers here - both $s$ and $t$ are realized in the form of transformers. This makes obvious sense when we think about the molecules as sequences of atoms, where each atom corresponds to one input token.
+As it is so common with current ML papers, we cannot get around using transformers here - both $s$ and $t$ are realized in the form of transformers. As you know, transformers are really good with input data that can be split into sequential tokens. This makes obvious sense when we think about the molecules as sequences of atoms, where each atom corresponds to one input token.
 
 Let's analyze the structure of the transformer that outputs a translation of $z^v$ (in the above image, this would be the second part of the first transition). All of the other transformers work in an analogue way.
 
@@ -176,21 +176,21 @@ This graphic from the paper nicely summarizes the entire normalizing flow struct
 ![Whole Architecture](assets/architecture.png)
 [Image source](https://arxiv.org/pdf/2302.01170)
 
-Note the diagonal lines signifying where the two rightmost subcomponents fit into the flow. The flow starts with $x^p(t)$ and $z^p, z^v$ sampled normally, and ends with $x^p(t+\tau), \ x^v(t+\tau)$. You can easily see the RealNVP approach in the alternating scaling and transformation of our inputs, as well as the transformer architecture which was just described.
+Note the diagonal lines signifying where the two rightmost subcomponents fit into the flow. The flow starts with $x^p(t)$ and $z^p, z^v$ sampled normally, and ends with $x^p(t+\tau), \ x^v(t+\tau)$. You can easily see the RealNVP approach in the alternating scaling and transformation of our inputs, as well as the transformer architecture which was just described. The rightmost square details the novel variant of attention weights.
 
 ## Training
 
 We have finally set everything up, and now it's time to perform training on the parameters $\theta$ for our normalizing flow to approximate $\mu(x(t+\tau)\mid x(t))$.
  
-For the dataset, sequences $\mathcal{T}_i = (x(0),x(\tau),x(2\tau),...)$ were generated for different peptides using a traditional MD Library.
+For the dataset, sequences $\mathcal{T}_i = (x(0),x(\tau),x(2\tau),...)$ were generated for different peptides using a traditional MD library.
 
 Since the training data is really what determines the scope of the possible input data, it can be assumed the model generalizes well for all kinds of peptides, but possibly not too well for completely different molecular systems.
 
-For the Loss function, there are actually two objectives we are interested in optimizing:
+For the loss function, there are actually two objectives we are interested in optimizing:
 1. The deviation from the dataset, which is the standard log likelihood: $$\mathcal{L}_{\mathrm{lik}}(\theta):=\frac{1}{K}\sum_{k=1}^{K} \text{log} \ p_{\theta}(x^{(k)}(t+\tau)\vert x^{(k)}(t))$$
 
 2. The acceptance in MH. Recall that: "A good proposal distribution will lead to better states being generated, and thus more states being accepted". \
-To maximize our acceptance, we need to maximize the term (the big fraction has been shortened to $r_{\theta}$ for brevity) $$A(x^{\prime},x)=\mathrm{min}\left(1,r_{\theta}(x,x')\right)$$ Which is equivalent to maximizing $r_{\theta}$ directly. This results in the loss function: $$\mathcal{L}_{\mathrm{acc}}(\theta):=\frac{1}{K}\sum_{k=1}^{K}\log r_{\theta}(x^{(k)}(t),{x'}_{\theta}^{(k)}(t+\tau))$$ The issue here is that in order to please the acceptance distribution, only conservative changes in state will be proposed, which is not productive either (exploration vs. exploitation). To counteract this, we instead use a Loss function very similar to $\mathcal{L}_{\mathrm{lik}}(\theta)$: $$L_{\text{ent}}(\theta) = -\frac{1}{K} \sum_{k=1}^K \log p_{\theta}({x'}_{\theta}^{(k)}(t + \tau) \mid  x^{(k)}(t))$$ This can be interpreted as the negative log-likelihood of the proposed transitions according to the model, allowing for more exploration in our transitions.
+To maximize our acceptance, we need to maximize the term (the big fraction has been shortened to $r_{\theta}$ for brevity) $$A(x^{\prime},x)=\mathrm{min}\left(1,r_{\theta}(x,x')\right)$$ Which is equivalent to maximizing $r_{\theta}$ directly. This results in the loss function: $$\mathcal{L}_{\mathrm{acc}}(\theta):=\frac{1}{K}\sum_{k=1}^{K}\log r_{\theta}(x^{(k)}(t),{x'}_{\theta}^{(k)}(t+\tau))$$ The issue here is that in order to please the acceptance distribution, only conservative changes in state will be proposed, which is not productive either (exploration vs. exploitation). To counteract this, we instead use a loss function very similar to $\mathcal{L}_{\mathrm{lik}}(\theta)$: $$L_{\text{ent}}(\theta) = -\frac{1}{K} \sum_{k=1}^K \log p_{\theta}({x'}_{\theta}^{(k)}(t + \tau) \mid  x^{(k)}(t))$$ This can be interpreted as the negative log-likelihood of the proposed transitions according to the model, allowing for more exploration in our transitions.
 
 
 ## Putting everything together
